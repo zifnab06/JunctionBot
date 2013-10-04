@@ -17,8 +17,8 @@ bot.load_config()
 
 # load our plugins
 from RedditBot.plugins import (reddit, twitter, botutils, youtube, badword, tell, minecraft, google,
-                               lastfm, silly, config, kickrejoin, grab, wolframalpha, mcbouncer, python,
-                               wikipedia, github, countdown, vimeo, steam, mumble, imdb)
+                               lastfm, config, kickrejoin, grab, wolframalpha, python,
+                               wikipedia, github, vimeo, steam, mumble, imdb, countdown)
 
 # Available plugins that aren't loaded by default
 # from RedditBot.plugins import eval

@@ -1,7 +1,6 @@
 
 from RedditBot import bot, utils
 
-from RedditBot.plugins.mcbouncer import mcb_status
 from RedditBot.plugins import mumble
 
 import socket
@@ -17,13 +16,8 @@ account = {
 isup_re = re.compile(r'is (\w+) (?:up|down)', re.I)
 server_re = re.compile(r'^\s*([A-Za-z0-9_-]+\.[A-Za-z0-9_.-]+)(?::([0-9]{1,5}))?\s*$')
 
-nerd_nu = [
-    ('c.nerd.nu', 25565, ['c', 'creative']),
-    ('p.nerd.nu', 25565, ['p', 'pve']),
-    ('s.nerd.nu', 25565, ['s', 'survival', 'pvp']),
-    ('chaos.nerd.nu', 25565, ['x', 'chaos']),
-    ('event.nerd.nu', 25565, ['e', 'event', 'ctf']),
-    ('mumble.nerd.nu', 6162, ['m', 'mumble', 'voice'])
+server_list = [
+    ('junction.at', 25565, ['c', 'p', 's', 'creative', 'pve', 'survival', 'event', 'junction'])
 ]
 
 
@@ -73,7 +67,7 @@ def get_info(host, port):
 
 def find_server(name):
     name = name.lower()
-    for server in nerd_nu:
+    for server in server_list:
         if name == server[0] or name in server[2]:
             return server
     return None
@@ -142,21 +136,14 @@ def status(context):
         return line.format(**info)
 
     def mumble_info():
-        up = mumble.get_info('mumble.nerd.nu', 6162)
+        up = mumble.get_info('mumble.junction.at', 64738)
         return 'Mumble: {}'.format('[{users}/{max}]'.format(**up) if up['success'] else 'Down')
-
-    def mcb_info():
-        up = mcb_status()['success']
-        return 'MCBouncer: {}'.format('Up!' if up else 'Down')
 
     def is_enabled(s):
         return any(name in bot.config['ENABLED_SERVERS'].split(',') for name in s[2])
 
-    servers = [server_info(s[0], s[1]) for s in nerd_nu if is_enabled(s)]
+    servers = [server_info(s[0], s[1]) for s in server_list if is_enabled(s)]
     servers.append(mumble_info())
-
-    if bot.config.get('MCBOUNCER_KEY', False):
-        servers.append(mcb_info())
 
     return ' | '.join(servers)
 
@@ -168,7 +155,7 @@ def is_x_up(context):
     if not server:
         return
 
-    if server[0] == 'mumble.nerd.nu':
+    if server[0] == 'mumble.junction.at':
         context.args = '{0}:{1}'.format(server[0], server[1])
         info = mumble.mumble(context)
         return info
@@ -191,7 +178,7 @@ def isup(context):
             return
         server = (match.group(1), match.group(2) or 25565, 'players')
 
-    if server[0] == 'mumble.nerd.nu':
+    if server[0] == 'mumble.junction.at':
         context.args = '{0}:{1}'.format(server[0], server[1])
         info = mumble.mumble(context)
         return info

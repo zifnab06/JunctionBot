@@ -55,7 +55,7 @@ def get_info(host, port=64738):
 def mumble(context):
     '''Usage: .mumble <[host[:port]]>'''
     if context.args.strip() == '':
-        context.args = 'mumble.nerd.nu:6162'
+        context.args = 'mumble.junction.at:64738'
 
     server = server_re.match(context.args)
     if server is None:
