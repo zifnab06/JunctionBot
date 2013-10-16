@@ -89,10 +89,16 @@ def test_expr(expr, numbers=None):
     return ResolveExpr(numbers).visit(expr)
 
 
-def get_number(big=False):
+def get_numbers(big_count):
     random.seed(os.urandom(1024))
-    nums = ([25, 50, 75, 100] if big else range(1, 10))
-    return random.choice(nums)
+    big = [25, 50, 75, 100]
+    small = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] * 2
+    nums = []
+    for i in range(big_count):
+        nums.append(big.pop(random.randint(0, len(big)-1)))
+    for i in range(6 - big_count):
+        nums.append(small.pop(random.randint(0, len(small)-1)))
+    return nums
 
 
 def exact_or_approx(f):
@@ -136,17 +142,24 @@ def decimal(context):
 
 @bot.command('countdown')
 def new_countdown(context):
+    '''.countdown <big number count>'''
     if context.line['sender'].lower() not in bot.config['COUNTDOWN_CHANNELS']:
         return '{0} not in countdown channel whitelist: [{1}]'.format(context.line['sender'],
                 ','.join(bot.config['COUNTDOWN_CHANNELS']))
     global current_game
     if current_game and time() - current_game[2] < 30:
         return u'{user}: Please wait before starting a new round.'.format(**context.line)
-    big = 2
-    small = 6 - big
-    use_nums = [get_number(big=True) for x in range(big)] + [get_number() for x in range(small)]
+    if not context.args:
+        return new_countdown.__doc__
+    try:
+        big_count = int(context.args)
+    except ValueError:
+        return u'{user}: Big number count must be an integer 0-4'.format(**context.line)
+    if not big_count in (0,1,2,3,4):
+        return u'{user}: Big number count must be an integer 0-4'.format(**context.line)
+    use_nums = get_numbers(big_count)
     random.seed(os.urandom(1024))
-    target = Fraction(random.randint(100, 999))
+    target = Fraction(random.randint(101, 999))
     current_game = (target, use_nums, time())
     return u'Target: \x02{target}\x02. Use {numbers} and operators +, -, *, /.'.format(target=target, numbers=', '.join(map(str, use_nums)))
 
