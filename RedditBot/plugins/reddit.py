@@ -92,7 +92,7 @@ def announce_reddit(context):
         try:
             submission = submission.json[0]['data']['children'][0]['data']
         except Exception:
-            return '{0}: Could not fetch json'.format(context.line['user'])
+            return None #'{0}: Could not fetch json'.format(context.line['user'])
 
     if is_blacklisted(submission['subreddit']):
         return  # don't give them the satisfaction!
