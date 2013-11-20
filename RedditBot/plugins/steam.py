@@ -20,6 +20,8 @@ agecheck_params = {
 
 @bot.regex(store_re)
 def store(context):
+    if not bot.config["ANNOUNCE_URLS"]:
+        return None
     url = context.line['regex_search'].group(1)
     r = utils.make_request(url, params=steam_params)
     if isinstance(r, str):

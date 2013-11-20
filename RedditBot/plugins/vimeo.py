@@ -10,6 +10,8 @@ video_line = u"'{title}' - {length} - {views:,d} views - by {author}"
 
 @bot.regex(video_link)
 def video(context):
+    if not bot.config["ANNOUNCE_URLS"]:
+        return None
     video_id = context.line['regex_search'].groups()[0]
     url = video_url.format(id=video_id)
     r = utils.make_request(url)

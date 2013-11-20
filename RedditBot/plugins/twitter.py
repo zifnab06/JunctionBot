@@ -78,6 +78,8 @@ def extract_info(json):
 
 @bot.regex(tweet_re)
 def announce_tweet(context):
+    if not bot.config["ANNOUNCE_URLS"]:
+        return None
     ''' Announces tweets as they are posted in the channel '''
     tweet_id = context.line['regex_search'].group(1)
     tweet, code = Tweet.by_id(tweet_id)

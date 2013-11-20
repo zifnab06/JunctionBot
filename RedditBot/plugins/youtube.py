@@ -52,6 +52,8 @@ def get_video_information(vid_id, json=None):
 
 @bot.regex(youtube_re)
 def youtube_url(context):
+    if not bot.config["ANNOUNCE_URLS"]:
+        return None
     vid_id = context.line['regex_search'].groups()[0]
     return get_video_information(vid_id)
 

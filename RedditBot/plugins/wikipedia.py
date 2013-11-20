@@ -68,6 +68,8 @@ def wiki_search(query):
 
 @bot.regex(wiki_re)
 def wiki_find(context):
+    if not bot.config["ANNOUNCE_URLS"]:
+        return None
     query = context.line['regex_search'].groups()[-1]
     result = wiki_search(query)
     print result
