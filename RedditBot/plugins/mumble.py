@@ -55,7 +55,7 @@ def get_info(host, port=64738):
 def mumble(context):
     '''Usage: .mumble <[host[:port]]>'''
     if context.args.strip() == '':
-        context.args = bot.config['MINECRAFT_MUMBLE_SERVER'] + ':' + bot.config['MINECRAFT_MUMBLE_PORT']
+        context.args = bot.config['MINECRAFT_MUMBLE_SERVER'] + ':' + str(bot.config['MINECRAFT_MUMBLE_PORT'])
 
     server = server_re.match(context.args)
     if server is None:
