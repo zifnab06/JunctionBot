@@ -14,14 +14,9 @@ if not bot.h_config:
 
 bot.load_config()
 
-
 # load our plugins
-pluginList = bot.config["PLUGINS"];
-for plugin in pluginList:
-    import_module(plugin, 'RedditBot.plugins')
-
-# Available plugins that aren't loaded by default
-# from RedditBot.plugins import eval
+for plugin in bot.config['ENABLED_PLUGINS']:
+    globals()[plugin] =  __import__('RedditBot.plugins.'+plugin, globals(), locals(), ['object'], -1)
 
 if 'RedditBot.plugins.tell' in sys.modules:
     tell.Base.metadata.create_all(tell.engine)
