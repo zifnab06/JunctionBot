@@ -56,3 +56,7 @@ class Config(object):
     BITLY_USER = ''
 
     ANNOUNCE_URLS = True
+
+    PLUGINS = ['reddit', 'twitter', 'botutils', 'youtube', 'badword', 'tell', 'minecraft', 'google',
+               'lastfm', 'config', 'kickrejoin', 'grab', 'wolframalpha', 'python',
+               'wikipedia', 'github', 'vimeo', 'steam', 'mumble', 'imdb', 'countdown', 'pun']
