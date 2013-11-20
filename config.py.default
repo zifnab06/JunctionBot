@@ -43,6 +43,12 @@ class Config(object):
     MINECRAFT_USER = ''
     MINECRAFT_PASSWORD = ''
     MINECRAFT_SHOW_SERVER_VER = False
+    MINECRAFT_SERVER_LIST =
+        [
+            ('junction.at', 25565, ['c', 'p', 's', 'creative', 'pve', 'survival', 'event', 'junction'])
+        ]
+    MINECRAFT_MUMBLE_SERVER = 'mumble.junction.at'
+    MINECRAFT_MUMBLE_PORT = 64738
 
     ENABLED_SERVERS = 'c,p,s'
 

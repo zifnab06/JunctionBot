@@ -16,10 +16,9 @@ account = {
 isup_re = re.compile(r'is (\w+) (?:up|down)', re.I)
 server_re = re.compile(r'^\s*([A-Za-z0-9_-]+\.[A-Za-z0-9_.-]+)(?::([0-9]{1,5}))?\s*$')
 
-server_list = [
-    ('junction.at', 25565, ['c', 'p', 's', 'creative', 'pve', 'survival', 'event', 'junction'])
-]
-
+server_list = bot.config['MINECRAFT_SERVER_LIST'];
+mumble_server = bot.config['MINECRAFT_MUMBLE_SERVER'];
+mumble_port = bot.config['MINECRAFT_MUMBLE_PORT']
 
 def get_info(host, port):
     try:
@@ -138,7 +137,7 @@ def status(context):
         return line.format(**info)
 
     def mumble_info():
-        up = mumble.get_info('mumble.junction.at', 64738)
+        up = mumble.get_info(mumble_server, mumble_port)
         return 'Mumble: {}'.format('[{users}/{max}]'.format(**up) if up['success'] else 'Down')
 
     def is_enabled(s):
@@ -157,7 +156,7 @@ def is_x_up(context):
     if not server:
         return
 
-    if server[0] == 'mumble.junction.at':
+    if server[0] == mumble_server:
         context.args = '{0}:{1}'.format(server[0], server[1])
         info = mumble.mumble(context)
         return info
@@ -180,7 +179,7 @@ def isup(context):
             return
         server = (match.group(1), match.group(2) or 25565, 'players')
 
-    if server[0] == 'mumble.junction.at':
+    if server[0] == mumble_server:
         context.args = '{0}:{1}'.format(server[0], server[1])
         info = mumble.mumble(context)
         return info
