@@ -83,6 +83,9 @@ def karma(context):
 
 @bot.regex(reddit_link)
 def announce_reddit(context):
+    if not bot.config["ANNOUNCE_URLS"]:
+        return None
+
     submission_id = context.line['regex_search'].group(1)
     url = 'http://www.reddit.com/comments/{}.json'.format(submission_id)
     submission = utils.make_request(url)

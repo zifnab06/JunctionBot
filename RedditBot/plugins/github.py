@@ -112,6 +112,8 @@ def api_format_repo(info, verbose=False):
 
 @bot.regex(commit_re)
 def announce_commit(context):
+    if not bot.config["ANNOUNCE_URLS"]:
+        return None
     return api_format_commit(context.line['regex_search'].groupdict()) or None
 
 
@@ -131,6 +133,8 @@ def get_github(context):
 
 @bot.regex(gist_re)
 def announce_gist(context):
+    if not bot.config["ANNOUNCE_URLS"]:
+        return None
     return api_format_gist(context.line['regex_search'].groupdict()) or None
 
 
@@ -144,6 +148,8 @@ def get_gist(context):
 
 @bot.regex(repo_re)
 def announce_repo(context):
+    if not bot.config["ANNOUNCE_URLS"]:
+        return None
     return api_format_repo(context.line['regex_search'].groupdict()) or None
 
 

@@ -15,6 +15,8 @@ imdb_re = re.compile(
 
 @bot.regex(imdb_re)
 def announce_title(context):
+    if not bot.config["ANNOUNCE_URLS"]:
+        return None
     media_id = context.line['regex_search'].group('id')
     r = utils.make_request(base_url, params={'i': media_id})
     if isinstance(r, str):

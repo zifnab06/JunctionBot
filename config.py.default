@@ -48,3 +48,5 @@ class Config(object):
 
     BITLY_KEY = ''
     BITLY_USER = ''
+
+    ANNOUNCE_URLS = True
