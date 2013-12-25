@@ -8,4 +8,4 @@ def search(context):
     """Usage: .vend"""
     data = urllib2.urlopen(base_url)
     for line in data:
-        return "It Vends {item}".format(item=line)
+        return "\x01ACTION vends {item}\x01".format(item=line)
