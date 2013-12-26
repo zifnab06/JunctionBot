@@ -5,6 +5,8 @@ from RedditBot.plugins import mumble
 
 import socket
 import re
+import struct
+import json
 
 from requests import codes
 
@@ -16,51 +18,63 @@ account = {
 isup_re = re.compile(r'is (\w+) (?:up|down)', re.I)
 server_re = re.compile(r'^\s*([A-Za-z0-9_-]+\.[A-Za-z0-9_.-]+)(?::([0-9]{1,5}))?\s*$')
 
-server_list = bot.config['MINECRAFT_SERVER_LIST'];
+serverlist = bot.config['MINECRAFT_SERVER_LIST'];
 mumble_server = bot.config['MINECRAFT_MUMBLE_SERVER'];
 mumble_port = bot.config['MINECRAFT_MUMBLE_PORT']
 
-def get_info(host, port):
+def unpack_varint(s):
+    d = 0
+    for i in range(5):
+        b = ord(s.recv(1))
+        d |= (b & 0x7F) << 7*i
+        if not b & 0x80:
+            break
+    return d
+
+def pack_varint(d):
+    o = ""
+    while True:
+        b = d & 0x7F
+        d >>= 7
+        o += struct.pack("B", b | (0x80 if d > 0 else 0))
+        if d == 0:
+            break
+    return o
+
+def pack_data(d):
+    return pack_varint(len(d)) + d
+
+def pack_port(i):
+    return struct.pack('>H', i)
+
+def get_info(host='localhost', port=25565):
     try:
-        #Set up our socket
+        # Connect
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.settimeout(2.0)
         s.connect((host, port))
+        # Send handshake + status request
+        s.send(pack_data("\x00\x00" + pack_data(host.encode('utf8')) + pack_port(port) + "\x01"))
+        s.send(pack_data("\x00"))
+    
+        # Read response
+        unpack_varint(s)     # Packet length
+        unpack_varint(s)     # Packet ID
+        l = unpack_varint(s) # String length
 
-        #Send 0xFE: Server list ping
-        s.send('\xfe')
-        #Send a payload of 0x01 to trigger a new response if the server supports it
-        s.send('\x01')
-        #Send an additional byte (bungee requires 3)
-        s.send('\xfa')
-
-        #Read as much data as we can (max packet size: 241 bytes)
-        d = s.recv(256)
+        d = ""
+        while len(d) < l:
+            d += s.recv(1024)
+    
+        # Close our socket
         s.close()
-
-        #Check we've got a 0xFF Disconnect
-        assert d[0] == '\xff'
-
-        #Remove the packet ident (0xFF) and the short containing the length of the string
-        #Decode UCS-2 string
-        d = d[3:].decode('utf-16be')
-
-        #If the response string starts with simolean1, then we're dealing with the new response
-        if (d.startswith(u'\xa7' + '1')):
-            d = d.split(u'\x00')
-            #Return a dict of values
-            return {'protocol_version': int(d[1]),
-                    'minecraft_version':    d[2],
-                    'motd':                 d[3],
-                    'players':          int(d[4]),
-                    'max_players':      int(d[5])}
-        else:
-            d = d.split(u'\xa7')
-            #Return a dict of values
-            return {'motd':         d[0],
-                    'players':   int(d[1]),
-                    'max_players': int(d[2])}
-
+    
+        # Load json and return
+        info = json.loads(d.decode('utf8'))
+        return {'protocol_version': info['version']['protocol'],
+                'minecraft_version':    info['version']['name'],
+                'motd':                 info['description'],
+                'players':          info['players']['online'],
+                'max_players':      info['players']['max']}
     except Exception, e:
         print e
         return False
@@ -68,7 +82,7 @@ def get_info(host, port):
 
 def find_server(name):
     name = name.lower()
-    for server in server_list:
+    for server in serverlist:
         if name == server[0] or name in server[2]:
             return server
     return None
@@ -143,7 +157,7 @@ def status(context):
     def is_enabled(s):
         return any(name in bot.config['ENABLED_SERVERS'].split(',') for name in s[2])
 
-    servers = [server_info(s[0], s[1]) for s in server_list if is_enabled(s)]
+    servers = [server_info(s[0], s[1]) for s in serverlist if is_enabled(s)]
     servers.append(mumble_info())
 
     return ' | '.join(servers)
