@@ -1,14 +1,14 @@
 class Config(object):
     # Server configuration
-    SERVER = 'irc.gamesurge.net'
+    SERVER = 'irc.rozznet.net'
     PORT = 6667
     SSL = False
     TIMEOUT = 300
     DEBUG = False
 
-    NICK = 'RedditBot'
-    REALNAME = 'https://github.com/buttscicles/RedditBot'
-    CHANNELS = ['#RedditMC', '#countdown']
+    NICK = 'JunctionBot'
+    REALNAME = 'https://github.com/zifnab06/JunctionBot'
+    CHANNELS = ['#junction', '#countdown']
 
     ADMINS = ['*!joe@*.buttscicl.es',
               '*!joe@buttscicl.es',
