@@ -9,3 +9,8 @@ def insult(context):
     '''.insult <user>'''
     name = context.args
     return u'{0} is a {1}'.format(context.args, generate_insult())
+
+@bot.regex('.*<3.*')
+def lessthanthree(context):
+    return '</3'
+
