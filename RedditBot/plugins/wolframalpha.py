@@ -1,5 +1,6 @@
 
 from RedditBot import bot, utils
+from RedditBot.utils import generate_insult
 
 import xml.etree.ElementTree as ET
 
@@ -28,7 +29,7 @@ def wa_api(context):
         pods = xml.findall('.//pod[@primary=\'true\']/subpod/plaintext')
 
         if len(pods) < 1:
-            return 'No primary node returned.'
+            return 'No primary node returned, you {0}'.format(generate_insult())
 
         results = pods[-1].text.split('\n')
 
